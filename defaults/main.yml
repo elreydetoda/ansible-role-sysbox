@@ -1,2 +1,9 @@
 ---
 # defaults file for ansible-role-sysbox
+
+sysbox_version: 'latest'
+github_base_url: https://github.com
+sysbox_base_url: '{{ github_base_url }}/nestybox/sysbox'
+sysbox_release_url: '{{ sysbox_base_url }}/releases/{{ sysbox_version}}'
+sysbox_download_base_url: '{{ sysbox_base_url }}/releases/download'
+file_download: '{{ ansible_user_dir }}/sysbox.deb'

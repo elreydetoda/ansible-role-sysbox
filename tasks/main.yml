@@ -1,2 +1,31 @@
 ---
 # tasks file for ansible-role-sysbox
+- name: lookup latest relase
+  ansible.builtin.uri:
+    url: '{{ sysbox_release_url }}'
+  register: sysbox_release_reg
+
+- set_fact:
+    sysbox_string: "{{ lookup('url', sysbox_release_reg.url ) | regex_findall('sha\\d+sum\\s+\\S+,\\S+') | select('match', '.*' + ansible_distribution_release + '.*' ) | join }}"
+
+- set_fact:
+    sysbox_current_version: "{{ sysbox_release_reg.url | urlsplit('path') | basename }}"
+  when: sysbox_version == 'latest'
+  
+# example sysbox string
+#   sha256sum sysbox-ce_0.3.0-0.ubuntu-focal_amd64.deb,37d300a21452e7a3201fae02bab7b2ed6bc5f571df4f99f9f2bad1895f9a0557
+- set_fact:
+    hashalg: "{{ (sysbox_string).split(' ')[0] | regex_search('\\w+\\d+')}}"
+    checksum: "{{ (sysbox_string).split(',')[1] }}"
+    filename: "{{ (sysbox_string).split(',')[0].split(' ')[1] }}"
+
+- name: downloading deb for current release
+  ansible.builtin.get_url:
+    checksum: '{{ hashalg }}:{{ checksum }}'
+    url: '{{ sysbox_download_base_url }}/{{ sysbox_current_version | default(sysbox_version) }}/{{ filename }}'
+    dest: '{{ file_download }}'
+
+- name: Install sysbox package
+  apt:
+    deb: '{{ file_download }}'
+  become: true
