@@ -42,6 +42,7 @@
     - sysbox_version
     - filenaem
     - file_download
+    - sysbox_string
   when: debugging
 
 - name: downloading deb for current release
