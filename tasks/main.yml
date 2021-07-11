@@ -18,7 +18,7 @@
   register: sysbox_release_reg
 
 - set_fact:
-    sysbox_string: "{{ lookup('url', sysbox_release_reg.url ) | regex_findall('sha\\d+sum\\s+\\S+,\\S+') | select('match', '.*' + ansible_distribution_release + '.*' ) | join }}"
+    sysbox_string: "{{ (lookup('url', sysbox_release_reg.url ) | regex_findall('sha\\d+sum\\s+\\S+,\\S+') | select('match', '.*' + ansible_distribution_release + '.*' ))[0] | join }}"
 
 - set_fact:
     sysbox_current_version: "{{ sysbox_release_reg.url | urlsplit('path') | basename }}"
