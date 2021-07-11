@@ -31,6 +31,19 @@
     checksum: "{{ (sysbox_string).split(',')[1] }}"
     filename: "{{ (sysbox_string).split(',')[0].split(' ')[1] }}"
 
+- name: debugging dynamic info
+  debug:
+    var: '{{ item }}'
+  loop:
+    - hashalg
+    - checksum
+    - sysbox_download_base_url
+    - sysbox_current_version
+    - sysbox_version
+    - filenaem
+    - file_download
+  when: debugging
+
 - name: downloading deb for current release
   ansible.builtin.get_url:
     checksum: '{{ hashalg }}:{{ checksum }}'
